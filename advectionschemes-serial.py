@@ -56,4 +56,38 @@ T = ones([imax,jmax]);
 
 T_init=0 # initial temperature
 
-T_l = raw_input("Enter the temperature")
+T_l = raw_input("Enter the temperature on the left face : ")
+
+T_t = raw_input("Enter the temperature on the top face : ")
+
+T_b = raw_input("Enter the temperature on the bottom face : ")
+
+for i in range(1,imax-1):
+    for j in range(1,jmax-1):
+
+        T(i;j)=T_init; # initial temperature
+
+for i in range(1,imax-1):
+    T(i;1)=T_l # west
+
+for i in range(1,imax-1):
+    T(i;jmax)=T_l; # north
+
+for j in range(1,jmax-1):
+    T(1;j) = T_b; # south
+
+for j in range(1,jmax-1):
+    T(imax;j)=T(imax-1;j) # east
+
+##################### calculating mass flow rate through the face ##################
+
+mx = u*rho
+
+my = v*rho
+
+mx_p = max(mx,0);mx_n=min(mx,0);
+my_p = max(my,0);my_n=min(my,o);
+
+############# Select the schemes ############################
+
+c = raw_input("Select the schemes to be applied 1 ) FOU 2) SOU 3) QUICK")
