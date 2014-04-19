@@ -1,0 +1,62 @@
+'''
+Heat advection phenomena - Serial Numpy Vectorized code
+
+Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAdvection.pdf
+            Slides : 5.39, 5.41, 5.37
+'''
+
+import numpy as np
+
+print '''
+
+Scheme to approximate advection phenomena
+                 1 . First Order Upwind, FOU
+                 2 . Second Order Upwind , SOU
+                 3 . QUICK
+Enter below appropriate serial number of scheme to process :
+
+'''
+scheme = int(raw_input())
+assert scheme<4 and scheme>0, 'Enter any one of the three choices in range [1,2,3]'
+
+# Length and height of the problem domain
+L, H = 1.0, 1.0
+# Maximum number of grid points in L and H
+imax, jmax = 10, 10
+# Height and width of each interior Control Volume (CV)
+dx = L/(imax-2)
+dy = H/(jmax-2)
+
+# Material properties of square domain
+rho = 1000.0 # Density $\frac{Kg}{m^3}$
+cp  = 4180.0 # Specific heat capacity $\frac{W}{mK}$
+
+# Flow properties
+u, v = 1.0, 1.0 # Velocity in x and y direction $\frac{m}{s}
+
+epsilon = 1e-6; # Convergence criteria
+
+# Implementation of initial and boundary temperature 
+t_initial = 50.0
+t_left = 100.0
+t_top = 100.0
+t_bottom = 0.0
+t_right = 0.0
+
+t = np.zeros((jmax,imax)) + t_initial # temperature profile array
+t[:,0] = t_left
+t[-1,:] = t_bottom
+t[:,-1] = t_right
+t[0,:] = t_top
+t_old = t.copy() # Copy of initialized temperature profile array
+
+# Computation of 
+# Initialization of advection variables
+# Advection across CV boundary
+hx = np.zeros((jmax-2,imax-1))
+hy = np.zeros((jmax-1,imax-2))
+# Net advection flux in the interior CV's
+Q = np.zeros((jmax-2,imax-2))
+
+#print t
+
