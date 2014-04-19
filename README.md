@@ -5,21 +5,22 @@ Sem project for ME766 HPSC
 
 To use open mpi/mpi to parallelize the advection schemes mainly SOU and QUICK for finer grids to obtain a speed up.
 
-test problem
 
-   |-----------100--------------|
+TEST PROBLEM : 
+
+   |-------------0--------------|
    |                            |
    |                            |
    |                            |     
    |                            |
    |                            |
    |                            |
-300|                            | convective boundary condition
+100|                            | 0
    |                            |
    |                            |
    |                            |
    |----------------------------|
    
-              200
+                0
               
-  Also to see the effect of internal heat generation Q = 10000 and without heat generation.
+  u = v = 1 m/s
