@@ -6,6 +6,7 @@ Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAd
 '''
 
 import numpy as np
+import user_advection as ua
 
 print '''
 
@@ -50,7 +51,9 @@ t[:,-1] = t_right
 t[0,:] = t_top
 t_old = t.copy() # Copy of initialized temperature profile array
 
-# Computation of 
+# Computation of time step
+dt = (0.2*dx)/np.abs(u)
+
 # Initialization of advection variables
 # Advection across CV boundary
 hx = np.zeros((jmax-2,imax-1))
@@ -58,5 +61,18 @@ hy = np.zeros((jmax-1,imax-2))
 # Net advection flux in the interior CV's
 Q = np.zeros((jmax-2,imax-2))
 
-#print t
+''' In this problem, since velocity is considered to be constant and
+uniform through out the domain, mass flow rate doesn't change at all'''
+# Calculation of mass flow rate through unit area in x and y directions
+mx = rho*u
+my = rho*v
+
+constant_a = dt/(rho*cp*dx*dy)
+flag = 1;
+
+while flag > epsilon:
+    flag = 0
+
+
+print t
 
