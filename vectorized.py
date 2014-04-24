@@ -6,7 +6,7 @@ Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAd
 '''
 
 import numpy as np
-import user_advection as ua
+import user_func as uf
 
 print '''
 
@@ -56,8 +56,8 @@ dt = (0.2*dx)/np.abs(u)
 
 # Initialization of advection variables
 # Advection across CV boundary
-hx = np.zeros((jmax-2,imax-1))
-hy = np.zeros((jmax-1,imax-2))
+adv_x = np.zeros((jmax-2,imax-1))
+adv_y = np.zeros((jmax-1,imax-2))
 # Net advection flux in the interior CV's
 Q = np.zeros((jmax-2,imax-2))
 
@@ -67,12 +67,22 @@ uniform through out the domain, mass flow rate doesn't change at all'''
 mx = rho*u
 my = rho*v
 
+# Calculation of width of each CV in x and y directions
+x_width = np.zeros((jmax-2,imax))
+y_width = np.zeros((jmax,imax-2))
+x_width[:,1:-1] = dx
+y_width[1:-1,:] = dy 
+
+wpx1,wpx2,wpx3 = uf.weightx(x_width,scheme)
+wpy1,wpy2,wpy3 = uf.weighty(y_width,scheme)
+
 constant_a = dt/(rho*cp*dx*dy)
-flag = 1;
+flag = 1
 
 while flag > epsilon:
-    flag = 0
+    #advection flux calculation
+    adv_x = mx*(wpx1*t[1:-1,2:-1] + wpx2*t[])
 
 
-print t
+#print t
 
