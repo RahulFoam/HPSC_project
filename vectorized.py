@@ -7,6 +7,7 @@ Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAd
 
 import numpy as np
 import user_func as uf
+from time import time
 
 print '''
 
@@ -20,10 +21,11 @@ Enter below appropriate serial number of scheme to process :
 scheme = int(raw_input())
 assert scheme<4 and scheme>0, 'Enter any one of the three choices in range [1,2,3]'
 
+t1 = time()
 # Length and height of the problem domain
 L, H = 1.0, 1.0
 # Maximum number of grid points in L and H
-imax, jmax = 10, 10
+imax, jmax = 500, 500
 # Height and width of each interior Control Volume (CV)
 dx = L/(imax-2)
 dy = H/(jmax-2)
@@ -52,12 +54,16 @@ t[0,:] = t_top
 t_old = t.copy() # Copy of initialized temperature profile array
 
 # Computation of time step
-dt = (0.2*dx)/np.abs(u)
+dt = (0.0005*dx)/np.abs(u)
 
 # Initialization of advection variables
 # Advection across CV boundary
-adv_x = np.zeros((jmax-2,imax-1))
-adv_y = np.zeros((jmax-1,imax-2))
+t_x = np.zeros((jmax-2,imax-1))
+t_y = np.zeros((jmax-1,imax-2))
+t_x[:,0] = t[1:-1,0]
+t_x[:,-1] = t[1:-1,-1]
+t_y[0,:] = t[0,1:-1]
+t_y[-1,:] = t[-1,1:-1]
 # Net advection flux in the interior CV's
 Q = np.zeros((jmax-2,imax-2))
 
@@ -73,16 +79,32 @@ y_width = np.zeros((jmax,imax-2))
 x_width[:,1:-1] = dx
 y_width[1:-1,:] = dy 
 
+t2 = time()
+'''Calculation of weightage values for interpolation or extrapolation of temperature 
+at the interior faces of CV
+Note : Here mass flow rate is considered to be positive and uniform through out the domain, So from 
+user_func only positive weightages are called to the main function'''
 wpx1,wpx2,wpx3 = uf.weightx(x_width,scheme)
 wpy1,wpy2,wpy3 = uf.weighty(y_width,scheme)
+
+t3 = time()
 
 constant_a = dt/(rho*cp*dx*dy)
 flag = 1
 
 while flag > epsilon:
-    #advection flux calculation
-    adv_x = mx*(wpx1*t[1:-1,2:-1] + wpx2*t[])
+    #Temperature interpolated or extrapolated in the interior CV faces according to advection scheme
+    t_x[:,1:-1] = wpx1*t[1:-1,2:-1] + wpx2*t[1:-1,1:-2] + wpx3*t[1:-1,0:-3]
+    t_y[1:-1,:] = wpy1*t[1:-2,1:-1] + wpy2*t[2:-1,1:-1] + wpy3*t[3:,1:-1]
+    adv_x = mx*cp*dy*t_x
+    adv_y = my*cp*dx*t_y
+    q_adv = (adv_x[:,1:]-adv_x[:,0:-1]) + (adv_y[0:-1,:]-adv_y[1:,:])
+    t[1:-1,1:-1] = t[1:-1,1:-1] - constant_a*q_adv
+    flag = np.sqrt(np.mean((t-t_old)**2))
+    print flag
+    t_old = t.copy()
 
-
+t4 = time()
+print t4-t1
 #print t
 
