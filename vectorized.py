@@ -53,9 +53,6 @@ t[:,-1] = t_right
 t[0,:] = t_top
 t_old = t.copy() # Copy of initialized temperature profile array
 
-# Computation of time step
-dt = (0.0005*dx)/np.abs(u)
-
 # Initialization of advection variables
 # Advection across CV boundary
 t_x = np.zeros((jmax-2,imax-1))
@@ -89,17 +86,20 @@ wpy1,wpy2,wpy3 = uf.weighty(y_width,scheme)
 
 t3 = time()
 
-constant_a = dt/(rho*cp*dx*dy)
+aW = np.zeros((jmax-2,imax-2)) + mx*dy
+aS = np.zeros((jmax-2,imax-2)) + my*dx
+aP = aW+aS
 flag = 1
 
 while flag > epsilon:
     #Temperature interpolated or extrapolated in the interior CV faces according to advection scheme
-    t_x[:,1:-1] = wpx1*t[1:-1,2:-1] + wpx2*t[1:-1,1:-2] + wpx3*t[1:-1,0:-3]
-    t_y[1:-1,:] = wpy1*t[1:-2,1:-1] + wpy2*t[2:-1,1:-1] + wpy3*t[3:,1:-1]
-    adv_x = mx*cp*dy*t_x
-    adv_y = my*cp*dx*t_y
-    q_adv = (adv_x[:,1:]-adv_x[:,0:-1]) + (adv_y[0:-1,:]-adv_y[1:,:])
-    t[1:-1,1:-1] = t[1:-1,1:-1] - constant_a*q_adv
+    # Applying deferred correction term
+    t_x[:,1:-1] = wpx1*t[1:-1,2:-1] + (wpx2-1)*t[1:-1,1:-2] + wpx3*t[1:-1,0:-3]
+    t_y[1:-1,:] = wpy1*t[1:-2,1:-1] + (wpy2-1)*t[2:-1,1:-1] + wpy3*t[3:,1:-1]
+    b = mx*dy*(t_x[:,0:-1] - t_x[:,1:]) + my*dx*(t_y[1:,:] - t_y[0:-1,:])
+    for j in np.arange(jmax-2,0,-1):
+        for i in np.arange(1,imax-1):
+            t[j,i] = (aW[j-1,i-1]*t[j,i-1] + aS[j-1,i-1]*t[j+1,i] + b[j-1,i-1])/aP[j-1,i-1]
     flag = np.sqrt(np.mean((t-t_old)**2))
     print flag
     t_old = t.copy()
