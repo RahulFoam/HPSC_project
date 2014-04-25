@@ -8,6 +8,8 @@ Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAd
 import numpy as np
 import user_func as uf
 from time import time
+import matplotlib.pyplot as plt
+import pylab
 
 print '''
 
@@ -25,7 +27,7 @@ t1 = time()
 # Length and height of the problem domain
 L, H = 1.0, 1.0
 # Maximum number of grid points in L and H
-imax, jmax = 500, 500
+imax, jmax = 100, 100
 # Height and width of each interior Control Volume (CV)
 dx = L/(imax-2)
 dy = H/(jmax-2)
@@ -52,6 +54,9 @@ t[-1,:] = t_bottom
 t[:,-1] = t_right
 t[0,:] = t_top
 t_old = t.copy() # Copy of initialized temperature profile array
+
+# Computation of time step
+dt = (0.2*dx)/np.abs(u)
 
 # Initialization of advection variables
 # Advection across CV boundary
@@ -81,30 +86,27 @@ t2 = time()
 at the interior faces of CV
 Note : Here mass flow rate is considered to be positive and uniform through out the domain, So from 
 user_func only positive weightages are called to the main function'''
-wpx1,wpx2,wpx3 = uf.weightx(x_width,scheme)
-wpy1,wpy2,wpy3 = uf.weighty(y_width,scheme)
+wpx1,wpx2 = uf.weightx(x_width,scheme)
+wpy1,wpy2 = uf.weighty(y_width,scheme)
 
 t3 = time()
 
-aW = np.zeros((jmax-2,imax-2)) + mx*dy
-aS = np.zeros((jmax-2,imax-2)) + my*dx
-aP = aW+aS
+constant_a = dt/(rho*cp*dx*dy)
 flag = 1
 
 while flag > epsilon:
     #Temperature interpolated or extrapolated in the interior CV faces according to advection scheme
-    # Applying deferred correction term
-    t_x[:,1:-1] = wpx1*t[1:-1,2:-1] + (wpx2-1)*t[1:-1,1:-2] + wpx3*t[1:-1,0:-3]
-    t_y[1:-1,:] = wpy1*t[1:-2,1:-1] + (wpy2-1)*t[2:-1,1:-1] + wpy3*t[3:,1:-1]
-    b = mx*dy*(t_x[:,0:-1] - t_x[:,1:]) + my*dx*(t_y[1:,:] - t_y[0:-1,:])
-    for j in np.arange(jmax-2,0,-1):
-        for i in np.arange(1,imax-1):
-            t[j,i] = (aW[j-1,i-1]*t[j,i-1] + aS[j-1,i-1]*t[j+1,i] + b[j-1,i-1])/aP[j-1,i-1]
+    t_x[:,1:-1] = wpx1*t[1:-1,2:-1] + wpx2*t[1:-1,1:-2]
+    t_y[1:-1,:] = wpy1*t[1:-2,1:-1] + wpy2*t[2:-1,1:-1]
+    adv_x = mx*cp*dy*t_x
+    adv_y = my*cp*dx*t_y
+    q_adv = (adv_x[:,1:]-adv_x[:,0:-1]) + (adv_y[0:-1,:]-adv_y[1:,:])
+    t[1:-1,1:-1] = t[1:-1,1:-1] - constant_a*q_adv
     flag = np.sqrt(np.mean((t-t_old)**2))
-    print flag
     t_old = t.copy()
 
 t4 = time()
 print t4-t1
-#print t
+plt.imshow(t)
+pylab.show()
 
