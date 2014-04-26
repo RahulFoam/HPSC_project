@@ -10,6 +10,9 @@ from mpi4py import MPI
 import user_func as uf
 import matplotlib.pyplot as plt
 import pylab
+import time
+
+t1=time.time()
 
 # Setting up the computational world for the program
 # Here default communication world is used
@@ -22,7 +25,7 @@ scheme = 1
 # Length and height of the problem domain
 L, H = 1.0, 1.0
 # Maximum number of grid points in L and H including boundary CV
-jmax, imax = 42,42 
+jmax, imax = 102,102 
 if rank == 0:
     assert (jmax-2)%size == 0, 'Number of processors doesnt divide the domain evenly'
 # Total domain is sub-divided into smaller blocks along the y or H direction
@@ -163,4 +166,8 @@ if rank == 0:
     plt.imshow(t_global)
     pylab.show()
 
+t2=time.time()
 
+t3=t2-t1
+
+print t3
