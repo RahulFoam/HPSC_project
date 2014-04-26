@@ -69,7 +69,7 @@ down = rank + 1
 up = rank - 1 
 
 # Computation of time step
-dt = (0.2*dy)/np.abs(u)
+dt = (0.1*dy)/np.abs(u)
 
 # Initialization of advection variables
 # Advection across CV boundary in both X and Y direction
