@@ -7,7 +7,7 @@ Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAd
 
 import numpy as np
 from mpi4py import MPI
-import user_func as uf
+import sys
 import matplotlib.pyplot as plt
 import pylab
 import time
@@ -20,12 +20,10 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-#Scheme to approximate advection phenomena is First order upwind (FOU)
-scheme = 1
 # Length and height of the problem domain
-L, H = 1.0, 1.0
+L, H = np.float(sys.argv[1]),np.float(sys.argv[1])
 # Maximum number of grid points in L and H including boundary CV
-jmax, imax = 102,102 
+imax, jmax = np.int(sys.argv[2]), np.int(sys.argv[2])
 if rank == 0:
     assert (jmax-2)%size == 0, 'Number of processors doesnt divide the domain evenly'
 # Total domain is sub-divided into smaller blocks along the y or H direction
@@ -46,7 +44,7 @@ cp  = 4180.0 # Specific heat capacity $\frac{W}{mK}$
 u, v = 1.0, 1.0 # Velocity in x and y direction $\frac{m}{s}
 
 # Number of iterations to run to get the steady state solution
-maxiter = 10000
+maxiter = np.int(sys.argv[3])
 
 # Implementation of initial and boundary temperature 
 # Top and Bottom boundary is only updated in two process
@@ -90,33 +88,11 @@ t_y[-1,:] = t[-1,1:-1] if rank == size-1 else 0.0
 mx = rho*u
 my = rho*v
 
-# Calculation of width of each CV in x and y directions
-x_width = np.zeros((local_jmax,imax))
-y_width = np.zeros((local_jmax+2,imax-2))
-x_width[:,1:-1] = dx
-y_width[:,:] = dy
-y_width[0,:] = 0.0 if rank == 0 else dy
-y_width[-1,:] = 0.0 if rank == size-1 else dy
-
-#Calculation of weightage values for interpolation or extrapolation of temperature 
-#at the interior faces of CV
-#Note : Here mass flow rate is considered to be positive and uniform through out the domain, So from 
-#user_func only positive weightages are called to the main function
-wpx2 = uf.weightx(x_width,scheme)
-wpy2t = uf.weighty(y_width,scheme)
-jtemp,itemp = np.shape(wpy2t)
-if rank > 0 and rank < size-1:
-    wpy2 = np.zeros((jtemp+2,itemp))
-    wpy2[0:-2,:] = wpy2t
-    wpy2[-2:,:] = wpy2t[0:2,:]
-elif rank == 0:
-    wpy2 = np.zeros((jtemp+1,itemp))
-    wpy2[0:-1,:] = wpy2t
-    wpy2[-1,:] = wpy2t[-1,:]
-elif rank == size-1:
-    wpy2 = np.zeros((jtemp+1,itemp))
-    wpy2[1:,:] = wpy2t
-    wpy2[0,:] = wpy2t[1,:]
+#Creation of weight matrix for the approximation of temperature at the CV face
+#For FOU all weights are having value 1
+#For inner sub-divisions of domain the weight matrix size is different from that of boundary sub-divisions 
+wpx = np.ones((local_jmax,imax-3))
+wpy = np.ones((local_jmax+1,imax-2)) if rank > 0 and rank < size-1 else np.ones((local_jmax,imax-2))
     
 constant_a = dt/(rho*cp*dx*dy)
 iteration = 0
@@ -145,13 +121,13 @@ while iteration < maxiter:
         t[-1,:] = recvbuf_d
 
     # Calculation of temperature at CV faces using FOU advection scheme
-    t_x[:,1:-1] = wpx2*t[1:-1,1:-2]
+    t_x[:,1:-1] = wpx*t[1:-1,1:-2]
     if rank > 0 and rank < size-1:
-        t_y = wpy2*t[1:,1:-1]
+        t_y = wpy*t[1:,1:-1]
     if rank == 0:
-        t_y[1:,:] = wpy2*t[2:,1:-1]
+        t_y[1:,:] = wpy*t[2:,1:-1]
     if rank == size-1:
-        t_y[0:-1,:] = wpy2*t[1:-1,1:-1]
+        t_y[0:-1,:] = wpy*t[1:-1,1:-1]
     
     # Physical method of calculation of temperature as discussed in reference at the start of code
     adv_x = mx*cp*dy*t_x

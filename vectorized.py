@@ -6,19 +6,15 @@ Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAd
 '''
 
 import numpy as np
-import user_func as uf
 from time import time
+import sys
 import matplotlib.pyplot as plt
 import pylab
 
-
-#First order upwind scheme to approximate advection phenomena
-scheme = 1
-
 # Length and height of the problem domain
-L, H = 1.0, 1.0
+L, H = np.float(sys.argv[1]),np.float(sys.argv[1])
 # Maximum number of grid points in L and H
-imax, jmax = 102, 102
+imax, jmax = np.int(sys.argv[2]), np.int(sys.argv[2])
 # Height and width of each interior Control Volume (CV)
 dx = L/(imax-2)
 dy = H/(jmax-2)
@@ -30,7 +26,7 @@ cp  = 4180.0 # Specific heat capacity $\frac{W}{mK}$
 # Flow properties
 u, v = 1.0, 1.0 # Velocity in x and y direction $\frac{m}{s}
 
-maxiter = 1000; # Number of iterations to converge
+maxiter = np.int(sys.argv[3]) # Number of iterations to converge
 
 # Implementation of initial and boundary temperature 
 t_initial = 50.0
@@ -46,7 +42,7 @@ t[:,-1] = t_right
 t[0,:] = t_top
 
 # Computation of time step
-dt = (0.2*dx)/np.abs(u)
+dt = (0.1*dx)/np.abs(u)
 
 # Initialization of advection variables
 # Advection across CV boundary
@@ -64,19 +60,10 @@ t_y[-1,:] = t[-1,1:-1]
 mx = rho*u
 my = rho*v
 
-# Calculation of width of each CV in x and y directions
-x_width = np.zeros((jmax-2,imax))
-y_width = np.zeros((jmax,imax-2))
-x_width[:,1:-1] = dx
-y_width[1:-1,:] = dy 
-
-
-#Calculation of weightage values for interpolation or extrapolation of temperature 
-#at the interior faces of CV
-#Note : Here mass flow rate is considered to be positive and uniform through out the domain, So from 
-#user_func only positive weightages are called to the main function
-wpx2 = uf.weightx(x_width,scheme)
-wpy2 = uf.weighty(y_width,scheme)
+#Creation of weight matrix for the approximation of temperature at the CV face
+#For FOU all weights are having value 1
+wpx = np.ones((jmax-2,imax-3))
+wpy = np.ones((jmax-3,imax-2))
 
 constant_a = dt/(rho*cp*dx*dy)
 iterations = 0
@@ -84,8 +71,8 @@ iterations = 0
 while iterations < maxiter:
     iterations += 1
     #Temperature interpolated or extrapolated in the interior CV faces according to advection scheme
-    t_x[:,1:-1] = wpx2*t[1:-1,1:-2]
-    t_y[1:-1,:] = wpy2*t[2:-1,1:-1]
+    t_x[:,1:-1] = wpx*t[1:-1,1:-2]
+    t_y[1:-1,:] = wpy*t[2:-1,1:-1]
     adv_x = mx*cp*dy*t_x
     adv_y = my*cp*dx*t_y
     q_adv = (adv_x[:,1:]-adv_x[:,0:-1]) + (adv_y[0:-1,:]-adv_y[1:,:])
