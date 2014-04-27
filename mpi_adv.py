@@ -10,9 +10,9 @@ from mpi4py import MPI
 import sys
 import matplotlib.pyplot as plt
 import pylab
-import time
+#import time
 
-t1=time.time()
+#t1=time.time()
 
 # Setting up the computational world for the program
 # Here default communication world is used
@@ -20,6 +20,7 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
+T1 = MPI.Wtime()
 # Length and height of the problem domain
 L, H = np.float(sys.argv[1]),np.float(sys.argv[1])
 # Maximum number of grid points in L and H including boundary CV
@@ -138,12 +139,12 @@ while iteration < maxiter:
 # Collecting the updated result to a local variable which will be send to the root process later
 T = t[1:-1,:]
 comm.Gather(T,t_global,0)
+
+T2 = MPI.Wtime()
 if rank == 0:
     plt.imshow(t_global)
     pylab.show()
 
-t2=time.time()
+#t2=time.time()
 
-t3=t2-t1
-
-print t3
+print 'Rank of processor',rank,'---> time taken ',T2-T1
