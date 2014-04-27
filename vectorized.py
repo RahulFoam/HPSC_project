@@ -7,15 +7,15 @@ Reference : https://www.dropbox.com/s/pkhxlfs1tuftn4w/L5_PhysBased_Unsteady_CHAd
 
 import numpy as np
 from time import time
-import sys
+#import sys
 import matplotlib.pyplot as plt
 import pylab
 
 T1 = time()
 # Length and height of the problem domain
-L, H = np.float(sys.argv[1]),np.float(sys.argv[1])
+L, H = 1000.0,1000.0
 # Maximum number of grid points in L and H
-imax, jmax = np.int(sys.argv[2]), np.int(sys.argv[2])
+imax, jmax = 302,302
 # Height and width of each interior Control Volume (CV)
 dx = L/(imax-2)
 dy = H/(jmax-2)
@@ -27,7 +27,7 @@ cp  = 4180.0 # Specific heat capacity $\frac{W}{mK}$
 # Flow properties
 u, v = 1.0, 1.0 # Velocity in x and y direction $\frac{m}{s}
 
-maxiter = np.int(sys.argv[3]) # Number of iterations to converge
+maxiter = 20000 # Number of iterations to converge
 
 # Implementation of initial and boundary temperature 
 t_initial = 50.0
