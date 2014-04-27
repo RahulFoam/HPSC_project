@@ -1,0 +1,79 @@
+Wrote profile results to prof_vectorized.py.lprof
+Timer unit: 1e-06 s
+
+File: prof_vectorized.py
+Function: vect_adv at line 16
+Total time: 37.3165 s
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    16                                           @profile
+    17                                           def vect_adv():
+    18         1            3      3.0      0.0      L, H = 1000.0,1000.0
+    19                                               # Maximum number of grid points in L and H
+    20         1            2      2.0      0.0      imax, jmax = 302,302
+    21                                               # Height and width of each interior Control Volume (CV)
+    22         1            4      4.0      0.0      dx = L/(imax-2)
+    23         1            1      1.0      0.0      dy = H/(jmax-2)
+    24                                               
+    25                                               # Material properties of square domain
+    26         1            1      1.0      0.0      rho = 1000.0 # Density $\frac{Kg}{m^3}$
+    27         1            1      1.0      0.0      cp  = 4180.0 # Specific heat capacity $\frac{W}{mK}$
+    28                                               
+    29                                               # Flow properties
+    30         1            1      1.0      0.0      u, v = 1.0, 1.0 # Velocity in x and y direction $\frac{m}{s}
+    31                                               
+    32         1            2      2.0      0.0      maxiter = 20000 # Number of iterations to converge
+    33                                               
+    34                                               # Implementation of initial and boundary temperature 
+    35         1            2      2.0      0.0      t_initial = 50.0
+    36         1            2      2.0      0.0      t_left = 100.0
+    37         1            1      1.0      0.0      t_top = 100.0
+    38         1            2      2.0      0.0      t_bottom = 0.0
+    39         1            2      2.0      0.0      t_right = 0.0
+    40                                               
+    41         1          582    582.0      0.0      t = np.zeros((jmax,imax)) + t_initial # temperature profile array
+    42         1           23     23.0      0.0      t[:,0] = t_left
+    43         1            5      5.0      0.0      t[-1,:] = t_bottom
+    44         1            5      5.0      0.0      t[:,-1] = t_right
+    45         1            4      4.0      0.0      t[0,:] = t_top
+    46                                               
+    47                                               # Computation of time step
+    48         1           16     16.0      0.0      dt = (0.1*dx)/np.abs(u)
+    49                                               
+    50                                               # Initialization of advection variables
+    51                                               # Advection across CV boundary
+    52         1          203    203.0      0.0      t_x = np.zeros((jmax-2,imax-1))
+    53         1          220    220.0      0.0      t_y = np.zeros((jmax-1,imax-2))
+    54         1           15     15.0      0.0      t_x[:,0] = t[1:-1,0]
+    55         1            7      7.0      0.0      t_x[:,-1] = t[1:-1,-1]
+    56         1            7      7.0      0.0      t_y[0,:] = t[0,1:-1]
+    57         1            5      5.0      0.0      t_y[-1,:] = t[-1,1:-1]
+    58                                               
+    59                                               
+    60                                               #In this problem, since velocity is considered to be constant and
+    61                                               #uniform through out the domain, mass flow rate doesn't change at all
+    62                                               # Calculation of mass flow rate through unit area in x and y directions
+    63         1            2      2.0      0.0      mx = rho*u
+    64         1            2      2.0      0.0      my = rho*v
+    65                                               
+    66                                               #Creation of weight matrix for the approximation of temperature at the CV face
+    67                                               #For FOU all weights are having value 1
+    68         1          248    248.0      0.0      wpx = np.ones((jmax-2,imax-3))
+    69         1          244    244.0      0.0      wpy = np.ones((jmax-3,imax-2))
+    70                                               
+    71         1            9      9.0      0.0      constant_a = dt/(rho*cp*dx*dy)
+    72         1            2      2.0      0.0      iterations = 0
+    73                                               
+    74     20001        65338      3.3      0.2      while iterations < maxiter:
+    75     20000        42475      2.1      0.1          iterations += 1
+    76                                                   #Temperature interpolated or extrapolated in the interior CV faces according to advection scheme
+    77     20000      6545903    327.3     17.5          t_x[:,1:-1] = wpx*t[1:-1,1:-2]
+    78     20000      6194776    309.7     16.6          t_y[1:-1,:] = wpy*t[2:-1,1:-1]
+    79     20000      2325515    116.3      6.2          adv_x = mx*cp*dy*t_x
+    80     20000      2762922    138.1      7.4          adv_y = my*cp*dx*t_y
+    81     20000     11374670    568.7     30.5          q_adv = (adv_x[:,1:]-adv_x[:,0:-1]) + (adv_y[0:-1,:]-adv_y[1:,:])
+    82     20000      8003324    400.2     21.4          t[1:-1,1:-1] = t[1:-1,1:-1] - constant_a*q_adv
+    83                                                   
+    84         1            2      2.0      0.0      return None
+
