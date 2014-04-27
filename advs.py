@@ -96,21 +96,21 @@ T_b = int(raw_input("Enter the temperature on the bottom face : "))
 
 T_r = int(raw_input("Enter the temperature on the right face : "))
 
-for i in range(1,imax-1):
-    for j in range(1,jmax-1):
+for i in range(1,imax):
+    for j in range(1,jmax):
 
         T[i,j]=T_init; # initial temperature
 
-for i in range(0,imax-1):
+for i in range(0,imax):
     T[i,0]=T_l # west
 
-for i in range(0,imax-1):
+for i in range(0,imax):
     T[i,jmax-1]=T_b; # north
 
-for j in range(0,jmax-1):
+for j in range(0,jmax):
     T[0,j] = T_t; # south
 
-for j in range(0,jmax-1):
+for j in range(0,jmax):
     T[imax-1,j]=T_r # east
 
 # mass flow in the x and y direction
@@ -155,26 +155,15 @@ while err > eps:
     if iter>1:
         T=Tnp;
     
-    #conduction flux in X direction
-    for i in range(0,imax):
-        for j in range(1,jmax-1):
-            qx[i,j]=-(k/dy)*(T[i+1,j]-T[i,j]);
-            
-            
-    #conduction flux in Y direction
-    for i in range(1,imax-1):
-        for j in range(0,jmax-1):
-            qy[i,j]=-(k/dy)*(T[i,j+1]-T[i,j]);
-    
     
  #enthalpy in X direction
     
-    for j in range(1,jmax-1):
-        for i in range(0,imax-1):
+    for j in range(1,jmax):
+        for i in range(0,imax):
             if i==0:
                 hx[i,j]=Cp*mx*T[i,j];
                 
-            elif i==imax-2:
+            elif i==imax-1:
                 hx[i,j]=Cp*mx*T[i+1,j];            
             else:
                 
@@ -185,11 +174,11 @@ while err > eps:
     
     # heat flux in the Y direction
     
-    for j in range(0,jmax-1):
-        for i in range(1,imax-1):
+    for j in range(0,jmax):
+        for i in range(1,imax):
             if j==0:
                 hy[(i,j)]=Cp*my*T[(i,j)];               
-            elif j==jmax-2:
+            elif j==jmax-1:
                 hy[(i,j)]=Cp*my*T[(i,j+1)];            
             else:
                 Tn_p=w1*T[(i,j+1)]+w2*T[(i,j)]+w3*T[(i,j-1)];
@@ -199,8 +188,8 @@ while err > eps:
                 
     #advection 
     temp=0;
-    for i in range(1,imax-1):
-        for j in range(1,jmax-1):
+    for i in range(1,imax):
+        for j in range(1,jmax):
             
             Q_advec[(i,j)]=(hx[(i,j)]-hx[(i-1,j)])*dy+(hy[(i,j)]-hy[(i,j-1)])*dx
             
