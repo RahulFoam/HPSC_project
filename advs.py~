@@ -156,15 +156,15 @@ while err > eps:
         T=Tnp;
     
     #conduction flux in X direction
-    for i in range(0,imax-1):
+    for i in range(0,imax):
         for j in range(1,jmax-1):
-            qx[(i,j)]=-(k/dy)*(T[(i+1,j)]-T[(i,j)]);
+            qx[i,j]=-(k/dy)*(T[i+1,j]-T[i,j]);
             
             
     #conduction flux in Y direction
     for i in range(1,imax-1):
         for j in range(0,jmax-1):
-            qy[(i,j)]=-(k/dy)*(T[(i,j+1)]-T[(i,j)]);
+            qy[i,j]=-(k/dy)*(T[i,j+1]-T[i,j]);
     
     
  #enthalpy in X direction
@@ -172,15 +172,15 @@ while err > eps:
     for j in range(1,jmax-1):
         for i in range(0,imax-1):
             if i==0:
-                hx[(i,j)]=Cp*mx*T[(i,j)];
+                hx[i,j]=Cp*mx*T[i,j];
                 
             elif i==imax-2:
-                hx[(i,j)]=Cp*mx*T[(i+1,j)];            
+                hx[i,j]=Cp*mx*T[i+1,j];            
             else:
                 
-                Tn_p=w1*T[(i+1,j)]+w2*T[(i,j)]+w3*T[(i-1,j)];
-                Te_n=w1*T[(i,j)]+w2*T[(i+1,j)]+w3*T[(i+2,j)];
-                hx[(i,j)]=Cp*(mx_p*Tn_p + mx_n*Te_n);
+                Tn_p=w1*T[i+1,j]+w2*T[i,j]+w3*T[i-1,j];
+                Te_n=w1*T[i,j]+w2*T[i+1,j]+w3*T[i+2,j];
+                hx[i,j]=Cp*(mx_p*Tn_p + mx_n*Te_n);
             
     
     # heat flux in the Y direction
@@ -214,18 +214,6 @@ while err > eps:
             
     
     err = abs(math.sqrt(temp/((imax-1)*(jmax-1))));
-    
-    for i in range(0,imax-1):
-        Tnp[i,jmax-1]=T_t;
-    
-    for i in range(0,imax-1):
-        Tnp[i,0]=T_l;
-        
-    for j in range(0,jmax-1):
-        Tnp[0,j]=T_b;
-        
-    for j in range(0,jmax-1):
-        Tnp[imax-1,j]=T_r;
 
 print ("Iteration = %5d RMS Error (err) = %8.4e\n", iter , err)
 
