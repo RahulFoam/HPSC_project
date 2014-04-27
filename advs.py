@@ -215,17 +215,17 @@ while err > eps:
     
     err = abs(math.sqrt(temp/((imax-1)*(jmax-1))));
     
-    for i in range(0,imax-2):
-        Tnp[(i,jmax)]=T_t;
+    for i in range(0,imax-1):
+        Tnp[i,jmax-1]=T_t;
     
     for i in range(0,imax-1):
-        Tnp[(i,1)]=T_l;
+        Tnp[i,0]=T_l;
         
     for j in range(0,jmax-1):
-        Tnp[(1,j)]=T_b;
+        Tnp[0,j]=T_b;
         
     for j in range(0,jmax-1):
-        Tnp[(imax,j)]=T_r;
+        Tnp[imax-1,j]=T_r;
 
 print ("Iteration = %5d RMS Error (err) = %8.4e\n", iter , err)
 
