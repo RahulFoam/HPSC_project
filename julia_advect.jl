@@ -1,7 +1,11 @@
 T1 = time()
 H,L = 1000.0,1000.0
 
+<<<<<<< HEAD
 jmax,imax = 12,12
+=======
+jmax,imax = 502,502
+>>>>>>> cf7658969152296f5e38325fa2155b3cc5e78943
 
 dx = L/(imax-2)
 dy = H/(jmax-2)
