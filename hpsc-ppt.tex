@@ -78,6 +78,8 @@
 
 \usepackage{graphicx} % Allows including images
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{subcaption}
+\usepackage{caption}
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -114,150 +116,144 @@ Indian Institute of Technology, Bombay \\ % Your institution for the title page
 %----------------------------------------------------------------------------------------
 
 %------------------------------------------------
-\section{First Section} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%\section{First Section} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
 %------------------------------------------------
 
-\subsection{Subsection Example} % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
+%\subsection{Subsection Example} % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
 
 \begin{frame}
-\frametitle{Paragraphs of Text}
-Sed iaculis dapibus gravida. Morbi sed tortor erat, nec interdum arcu. Sed id lorem lectus. Quisque viverra augue id sem ornare non aliquam nibh tristique. Aenean in ligula nisl. Nulla sed tellus ipsum. Donec vestibulum ligula non lorem vulputate fermentum accumsan neque mollis.\\~\\
-
-Sed diam enim, sagittis nec condimentum sit amet, ullamcorper sit amet libero. Aliquam vel dui orci, a porta odio. Nullam id suscipit ipsum. Aenean lobortis commodo sem, ut commodo leo gravida vitae. Pellentesque vehicula ante iaculis arcu pretium rutrum eget sit amet purus. Integer ornare nulla quis neque ultrices lobortis. Vestibulum ultrices tincidunt libero, quis commodo erat ullamcorper id.
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Bullet Points}
+\frametitle{Implementation methods}
 \begin{itemize}
-\item Lorem ipsum dolor sit amet, consectetur adipiscing elit
-\item Aliquam blandit faucibus nisi, sit amet dapibus enim tempus eu
-\item Nulla commodo, erat quis gravida posuere, elit lacus lobortis est, quis porttitor odio mauris at libero
-\item Nam cursus est eget velit posuere pellentesque
-\item Vestibulum faucibus velit a augue condimentum quis convallis nulla gravida
+\item Serial vectorised Python code using Numpy module
+\item Using Python MPI library mpi4py
 \end{itemize}
 \end{frame}
 
 %------------------------------------------------
 
 \begin{frame}
-\frametitle{Blocks of Highlighted Text}
-\begin{block}{Block 1}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lectus nisl, ultricies in feugiat rutrum, porttitor sit amet augue. Aliquam ut tortor mauris. Sed volutpat ante purus, quis accumsan dolor.
-\end{block}
-
-\begin{block}{Block 2}
-Pellentesque sed tellus purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum quis magna at risus dictum tempor eu vitae velit.
-\end{block}
-
-\begin{block}{Block 3}
-Suspendisse tincidunt sagittis gravida. Curabitur condimentum, enim sed venenatis rutrum, ipsum neque consectetur orci, sed blandit justo nisi ac lacus.
-\end{block}
+\frametitle{Vectorised code}
+\begin{itemize}
+\item Non-vectorised code : Single pair of operands at a time
+\item Vectorised code : Multiple pair of operands at a time
+\end{itemize}
 \end{frame}
 
 %------------------------------------------------
+\begin{frame}
+\frametitle{Profiling}
+\begin{itemize}
+\item Program analysis to measure the memory and time complexity involved
+\item Performed to optimize code
+\end{itemize}% \\
+%\vspace{0.5cm}
+\pause
+In our program line by line profiling has been done using Kernprof
+\begin{figure}
+\centering
+\includegraphics[width=1.0\textwidth]{profile}
+\end{figure}
+\end{frame}
+
+%-----------------------------------------------
+\begin{frame}
+\frametitle{MPI Implementation}
+\begin{itemize}
+\item To utilise multiple processing elements
+available based on distributed shared memory concept
+\item Initiates same script on all PE's
+\item PE works on a part of whole domain data
+\item Data finally gathered back to root PE 
+\end{itemize}
+we implemented MPI library for python - \textbf{mpi4py}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}
+\frametitle{Computer Specification}
+\begin{itemize}
+\item Hardware : Intel Core i5-2430M CPU @ 2.40GHz × 4, \\
+\hspace{1.7cm} Memory 3.8 GB, L1 Cache 32K, L2 Cache 256K, \\
+\hspace{1.7cm} L3 Cache 3072K
+\item Software : Ubuntu 12.04, 64 bit
+\end{itemize}
+\end{frame}
+
+%---------------e---------------------------------
 
 \begin{frame}
-\frametitle{Multiple Columns}
-\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
-
-\column{.45\textwidth} % Left column and width
-\textbf{Heading}
-\begin{enumerate}
-\item Statement
-\item Explanation
-\item Example
-\end{enumerate}
-
-\column{.5\textwidth} % Right column and width
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lectus nisl, ultricies in feugiat rutrum, porttitor sit amet augue. Aliquam ut tortor mauris. Sed volutpat ante purus, quis accumsan dolor.
-
-\end{columns}
+\frametitle{Results}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{image52} % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+\caption{Solution of the advection problem}
+\end{figure}
 \end{frame}
 
-%------------------------------------------------
-\section{Second Section}
-%------------------------------------------------
+
+
+
+
 
 \begin{frame}
-\frametitle{Table}
-\begin{table}
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\caption{Table caption}
-\end{table}
+\frametitle{Results}
+\begin{figure}
+\centering 
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width=\textwidth]{102}
+\caption{Grid size 102}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width=\textwidth]{302}
+\caption{Grid size 302}
+\end{subfigure}
+\end{figure}
 \end{frame}
 
 %------------------------------------------------
-
 \begin{frame}
-\frametitle{Theorem}
-\begin{theorem}[Mass--energy equivalence]
-$E = mc^2$
-\end{theorem}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
-\frametitle{Verbatim}
-\begin{example}[Theorem Slide Code]
-\begin{verbatim}
-\begin{frame}
-\frametitle{Theorem}
-\begin{theorem}[Mass--energy equivalence]
-$E = mc^2$
-\end{theorem}
-\end{frame}\end{verbatim}
-\end{example}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Figure}
-Uncomment the code on this slide to include your own image from the same directory as the template .TeX file.
-%\begin{figure}
-%\includegraphics[width=0.8\linewidth]{test}
-%\end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
-\frametitle{Citation}
-An example of the \verb|\cite| command to cite within the presentation:\\~
-
-This statement requires citation \cite{p1}.
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{References}
-\footnotesize{
-\begin{thebibliography}{99} % Beamer does not support BibTeX so references must be inserted manually as below
-\bibitem[Smith, 2012]{p1} John Smith (2012)
-\newblock Title of the publication
-\newblock \emph{Journal Name} 12(3), 45 -- 678.
-\end{thebibliography}
-}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\Huge{\centerline{The End}}
+\frametitle{Results}
+\begin{figure}
+\centering 
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width=\textwidth]{402}
+\caption{Grid size 402}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width=\textwidth]{502}
+\caption{Grid size 502}
+\end{subfigure}
+\end{figure}
 \end{frame}
 
 %----------------------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Results}
+\begin{figure}
+\centering 
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width=\textwidth]{802}
+\caption{Grid size 802}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+\includegraphics[width=\textwidth]{1002}
+\caption{Grid size 1002}
+\end{subfigure}
+\end{figure}
+\end{frame}
+
+
+%------------------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Conclusions}
+\begin{itemize}
+\item Profiling helped us to identify the portion of the code which took maximum time for computation
+\item The performance for 2 and 4 PEs was as expected with increase in grid size 
+\item For 10 and 20 PEs, the computation time taken was more
+\item For grid size 402 and 502 there was a change in trend of the computation time
+\end{itemize}
+\end{frame}
 
 \end{document} 
